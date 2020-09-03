@@ -47,7 +47,6 @@ uint32_t* create_tag(uint32_t id, size_t value_size, uint8_t* value, size_t res_
     uint8_t* tag_val = (uint8_t*) &tag[i];
     for (unsigned int j = 0; j < value_size; j++)
     {
-        printf("val loop\n");
         tag_val[j] = value[j];
     }
 
