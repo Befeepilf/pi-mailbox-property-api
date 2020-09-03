@@ -184,10 +184,3 @@ uint32_t free_vc_mem(uint32_t handle)
 
     return status;
 }
-
-int main(int argc, char* argv)
-{
-    uint32_t handle = alloc_vc_mem(4, 4, MB_MEM_FLAG_L1_NONALLOCATING);
-    uint32_t bus_addr = lock_vc_mem(handle);
-    return free_vc_mem(handle);
-}
