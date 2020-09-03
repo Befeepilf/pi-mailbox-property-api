@@ -20,6 +20,9 @@
 #define MB_TAG_DMA_CHANNELS     0x00060001
 #define MB_TAG_GET_POWER_STATE  0x00020001
 #define MB_TAG_DEV_STARTUP_TIME 0x00020002
+#define MB_TAG_ALLOC_MEM        0x0003000c
+#define MB_TAG_LOCK_MEM         0x0003000d
+#define MB_TAG_FREE_MEM         0x0003000f
 
 
 uint32_t get_firmware_rev()
@@ -73,6 +76,7 @@ uint64_t get_board_serial()
     return serial;
 }
 
+
 size_t get_arm_mem_size()
 {
     uint32_t* res = make_empty_request(MB_TAG_ARM_MEM, 8);
@@ -91,6 +95,7 @@ size_t get_vc_mem_size()
     return vc_mem_size;
 }
 
+
 uint16_t get_dma_channels()
 {
     uint16_t channels = *make_empty_request(MB_TAG_DMA_CHANNELS, 4);
@@ -103,6 +108,7 @@ uint16_t get_dma_channels()
     }
     return channels;
 }
+
 
 uint32_t get_power_state(uint32_t device_id)
 {
@@ -129,9 +135,59 @@ uint32_t get_dev_startup_time(uint32_t device_id)
     uint32_t* res = make_request(buff);
 
     if (MB_DEBUG)
-    {
         printf("Device %u: %uus\n", res[0], res[1]);
-    }
 
     return res[1];
+}
+
+
+uint32_t alloc_vc_mem(size_t size, uint32_t alignment, uint32_t flags)
+{
+    uint32_t* value = malloc(3 * sizeof(uint32_t));
+    value[0] = size;
+    value[1] = alignment;
+    value[2] = flags;
+
+    size_t tag_size;
+    uint32_t* tag = create_tag(MB_TAG_ALLOC_MEM, 12, (uint8_t*) value, 4, &tag_size);
+    uint32_t* buff = create_buffer(tag_size, tag);
+    uint32_t handle = *make_request(buff);
+
+    if (MB_DEBUG)
+        printf("Handle: %u\n", handle);
+
+    return handle;
+}
+
+uint32_t lock_vc_mem(uint32_t handle)
+{
+    size_t tag_size;
+    uint32_t* tag = create_tag(MB_TAG_LOCK_MEM, 4, (uint8_t*) &handle, 4, &tag_size);
+    uint32_t* buff = create_buffer(tag_size, tag);
+    uint32_t bus_addr = *make_request(buff);
+
+    if (MB_DEBUG)
+        printf("Bus Address: %u\n", bus_addr);
+
+    return bus_addr;
+}
+
+uint32_t free_vc_mem(uint32_t handle)
+{
+    size_t tag_size;
+    uint32_t* tag = create_tag(MB_TAG_FREE_MEM, 4, (uint8_t*) &handle, 4, &tag_size);
+    uint32_t* buff = create_buffer(tag_size, tag);
+    uint32_t status = *make_request(buff);
+
+    if (MB_DEBUG)
+        printf("Status: %s\n", status == 0 ? "successful" : "unsuccessful");
+
+    return status;
+}
+
+int main(int argc, char* argv)
+{
+    uint32_t handle = alloc_vc_mem(4, 4, MB_MEM_FLAG_L1_NONALLOCATING);
+    uint32_t bus_addr = lock_vc_mem(handle);
+    return free_vc_mem(handle);
 }

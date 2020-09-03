@@ -30,18 +30,17 @@ size_t align_to_block(size_t size, size_t block)
 
 uint32_t* create_tag(uint32_t id, size_t value_size, uint8_t* value, size_t res_size, size_t* tag_size)
 {
-    assert(res_size >= value_size);
     assert(value_size > 0 ? value != NULL : value == NULL);
     assert(tag_size != NULL);
 
     // align tag to 4 bytes
-    size_t aligned_res_size = align_to_block(res_size, 4);
-    *tag_size = 3 * sizeof(uint32_t) + aligned_res_size;
+    size_t aligned_value_size = align_to_block(res_size > value_size ? res_size : value_size, 4);
+    *tag_size = 3 * sizeof(uint32_t) + aligned_value_size;
     uint32_t* tag = malloc(*tag_size);
 
     unsigned int i = 0;
     tag[i++] = id;
-    tag[i++] = aligned_res_size;
+    tag[i++] = aligned_value_size;
     tag[i++] = 0; // 0x0 indicates request
 
     uint8_t* tag_val = (uint8_t*) &tag[i];
@@ -51,7 +50,7 @@ uint32_t* create_tag(uint32_t id, size_t value_size, uint8_t* value, size_t res_
     }
 
     // padding for response buffer & 4 bytes alignment
-    for (unsigned int j = 0; j < aligned_res_size - value_size; j++)
+    for (int j = 0; j < aligned_value_size - value_size; j++)
     {
         tag_val[value_size + j] += 0;
     }
