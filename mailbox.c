@@ -69,9 +69,3 @@ uint64_t get_board_serial()
         printf("Serial: %llu\n", serial);
     return serial;
 }
-
-int main(int argc, char* argv)
-{
-    get_board_mac();
-    return 0;
-}
