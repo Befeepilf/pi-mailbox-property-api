@@ -1,6 +1,9 @@
 #ifndef MAILBOX_H
 #define MAILBOX_H
 
+#include <stddef.h> // for size_t
+#include <stdint.h> // for uintX_t
+
 #define MB_DEV_SDCARD   0x00000000
 #define MB_DEV_UART0    0x00000001
 #define MB_DEV_UART1    0x00000002
@@ -13,7 +16,7 @@
 
 #define MB_MEM_FLAG_DISCARDABLE         1 << 0 // can be resized to 0 at any time, use for cached data
 #define MB_MEM_FLAG_DIRECT              1 << 2 // 0xC alias, uncached
-#define MB_MEM_FLAG_COHERENT            2 << 2 //0x8 alias, non-allocating in L2 but coherent
+#define MB_MEM_FLAG_COHERENT            2 << 2 // 0x8 alias, non-allocating in L2 but coherent
 #define MB_MEM_FLAG_L1_NONALLOCATING    ((MB_MEM_FLAG_DIRECT) | (MB_MEM_FLAG_COHERENT))
 #define MB_MEM_FLAG_ZERO                1 << 4 // initialise buffer to all zeros
 #define MB_MEM_FLAG_NO_INIT             1 << 5 // don't initialise (default is to initialise to all ones)

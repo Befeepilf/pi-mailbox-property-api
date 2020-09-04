@@ -49,6 +49,9 @@ uint32_t* create_tag(uint32_t id, size_t value_size, uint8_t* value, size_t res_
         tag_val[j] = value[j];
     }
 
+    if (value != NULL)
+        free(value);
+
     // padding for response buffer & 4 bytes alignment
     for (int j = 0; j < aligned_value_size - value_size; j++)
     {
