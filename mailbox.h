@@ -32,7 +32,7 @@ uint64_t get_board_serial();
 size_t get_arm_mem_size(); // return value in bytes
 size_t get_vc_mem_size(); // return value in bytes
 
-uint16_t get_dma_channels(); // bits 0-15: DMA channels 0-15 (0=do not use, 1=usable)
+uint16_t get_usable_dma_channels(); // bits 0-15: DMA channels 0-15 (0=do not use, 1=usable)
 
 uint32_t get_power_state(uint32_t device_id); // bit 0: 0=off, 1=on; bit 1: 0=device exists, 1=device doesn't exist
 uint32_t get_dev_startup_time(uint32_t device_id); // returns time in us for the device's power to become stable after turning it on

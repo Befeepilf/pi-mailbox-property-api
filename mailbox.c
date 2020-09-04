@@ -96,7 +96,7 @@ size_t get_vc_mem_size()
 }
 
 
-uint16_t get_dma_channels()
+uint16_t get_usable_dma_channels()
 {
     uint16_t channels = *make_empty_request(MB_TAG_DMA_CHANNELS, 4);
     if (MB_DEBUG)
