@@ -49,9 +49,6 @@ uint32_t* create_tag(uint32_t id, size_t value_size, uint8_t* value, size_t res_
         tag_val[j] = value[j];
     }
 
-    if (value != NULL)
-        free(value);
-
     // padding for response buffer & 4 bytes alignment
     for (int j = 0; j < aligned_value_size - value_size; j++)
     {
@@ -153,7 +150,8 @@ uint32_t* make_empty_request(uint32_t tag_id, size_t res_size)
         &tag_size
     );
 
-    uint32_t* buffer = create_buffer(tag_size, tag);
+    uint32_t* buffer = create_buffer(tag_size, tag); // buffer is leaking
+    free(tag);
     uint32_t* res = make_request(buffer);
 
     return res;

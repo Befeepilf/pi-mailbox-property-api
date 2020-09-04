@@ -115,6 +115,7 @@ uint32_t get_power_state(uint32_t device_id)
     size_t tag_size;
     uint32_t* tag = create_tag(MB_TAG_GET_POWER_STATE, 4, (uint8_t*) &device_id, 8, &tag_size);
     uint32_t* buff = create_buffer(tag_size, tag);
+    free(tag);
     uint32_t* res = make_request(buff);
 
     if (MB_DEBUG)
@@ -124,7 +125,9 @@ uint32_t get_power_state(uint32_t device_id)
         printf("\t%s\n", res[1] & 1 << 1 ? "does not exist" : "exists");
     }
 
-    return res[1];
+    uint32_t state = res[1];
+    free(buff);
+    return state;
 }
 
 uint32_t get_dev_startup_time(uint32_t device_id)
@@ -132,12 +135,15 @@ uint32_t get_dev_startup_time(uint32_t device_id)
     size_t tag_size;
     uint32_t* tag = create_tag(MB_TAG_DEV_STARTUP_TIME, 4, (uint8_t*) &device_id, 8, &tag_size);
     uint32_t* buff = create_buffer(tag_size, tag);
+    free(tag);
     uint32_t* res = make_request(buff);
 
     if (MB_DEBUG)
         printf("Device %u: %uus\n", res[0], res[1]);
 
-    return res[1];
+    uint32_t time = res[1];
+    free(buff);
+    return time;
 }
 
 
@@ -151,7 +157,10 @@ uint32_t alloc_vc_mem(size_t size, uint32_t alignment, uint32_t flags)
     size_t tag_size;
     uint32_t* tag = create_tag(MB_TAG_ALLOC_MEM, 12, (uint8_t*) value, 4, &tag_size);
     uint32_t* buff = create_buffer(tag_size, tag);
+    free(tag);
     uint32_t handle = *make_request(buff);
+    free(buff);
+    free(value);
 
     if (MB_DEBUG)
         printf("Handle: %u\n", handle);
@@ -164,7 +173,9 @@ uint32_t lock_vc_mem(uint32_t handle)
     size_t tag_size;
     uint32_t* tag = create_tag(MB_TAG_LOCK_MEM, 4, (uint8_t*) &handle, 4, &tag_size);
     uint32_t* buff = create_buffer(tag_size, tag);
+    free(tag);
     uint32_t bus_addr = *make_request(buff);
+    free(buff);
 
     if (MB_DEBUG)
         printf("Bus Address: %u\n", bus_addr);
@@ -177,7 +188,9 @@ uint32_t free_vc_mem(uint32_t handle)
     size_t tag_size;
     uint32_t* tag = create_tag(MB_TAG_FREE_MEM, 4, (uint8_t*) &handle, 4, &tag_size);
     uint32_t* buff = create_buffer(tag_size, tag);
+    free(tag);
     uint32_t status = *make_request(buff);
+    free(buff);
 
     if (MB_DEBUG)
         printf("Status: %s\n", status == 0 ? "successful" : "unsuccessful");
